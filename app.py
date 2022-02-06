@@ -7,6 +7,6 @@ def webex_callback():
     if request.method == 'POST':
         print(request.json)
         print('hello World')
-        return Response(None, 200)
+        return Response('OK', 200)
     else:
         return Response("I'm alive", 200)
