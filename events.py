@@ -1,6 +1,7 @@
+from ast import For
 import email
 from flask import Flask, Response, request
-from sqlalchemy import String, Column, ForeignKey, Date
+from sqlalchemy import String, Column, ForeignKey, Date, UniqueConstraint
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
@@ -31,6 +32,7 @@ class Organisation(db.Model):
     name = Column(String, nullable=True)
 
 class Event(db.Model):
+    __tablename__ = 'event'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     organisation_id = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
     organiser_id = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
@@ -39,8 +41,19 @@ class Event(db.Model):
     organiser = db.relationship("Person", back_populates="events")
     organisation = db.relationship("Organisation", back_populates="events")
 
+class Registration(db.Model):
+    __tablename__ = 'registration'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_id = Column(UUID(as_uuid=True), ForeignKey("event.id"), nullable=False)
+    person_id = Column(UUID(as_uuid=True), ForeignKey("person.id"), nullable=False)
+    __table_args__ = (UniqueConstraint("event_id", "person_id", name="event_person_unique"))
+    event = db.relationship("Event", back_populates="registration")
+    person = db.relationship("Person", back_populates="registration")
+
 Organisation.events = db.relationship("Event", back_populates="organisation")
 Person.events = db.relationship("Event", back_populates="organiser")
+Person.registrations = db.relationship("Registration", back_populates="person")
+Event.registrations = db.relationship("Registration", back_populates="event")
 
 db.create_all()
 
@@ -63,8 +76,10 @@ def person():
         email = Email(email=email_address)
         person.emails.append(email)
     db.session.add(person)
+    db.session.flush()
+    db.session.refresh(person)
     db.session.commit()
-    return {"msg": "ok"}
+    return {"person_id": person.id}
 
 '''
 organisation {
@@ -77,8 +92,10 @@ def organisation():
     orgData = request.json
     org = Organisation(name=orgData["name"], email=orgData["email"])
     db.session.add(org)
+    db.session.flush()
+    db.session.refresh(org)
     db.session.commit()
-    return {"msg": "ok"}
+    return {"organisation_id": org.id}
 
 '''
 PUT
@@ -96,8 +113,14 @@ def event(room=None):
     if request.method == 'POST':
         event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"], room=eventData["room"])
         db.session.add(event)
+        db.session.flush()
+        db.session.refresh(event)
+        registration = Registration(event_id=event.id, person_id=event.organiser_id)
+        db.session.add(registration)
+        db.session.flush()
+        db.session.refresh(registration)
         db.session.commit()
-        return {"msg": "ok"}
+        return {"event_id": event.id, "registration_id": registration.id}
     elif request.method == 'PUT':
         event = Event(organisation_id=eventData["organisation"], date=eventData["date"], room=eventData["room"])
         if (type(eventData["organiser"]) == 'str'):
@@ -115,8 +138,14 @@ def event(room=None):
             else:
                 event.organiser_id = personFromDb[0].id
         db.session.add(event)
+        db.session.flush()
+        db.session.refresh(event)
+        registration = Registration(event_id=event.id, person_id=event.organiser_id)
+        db.session.add(registration)
+        db.session.flush()
+        db.session.refresh(registration)
         db.session.commit()
-        return {"msg": "ok"}
+        return {"event_id": event.id, "registration_id": registration.id}
     elif request.method == 'GET':
         eventsQueryData = Event.query.filter_by(room=room).all()
         events = []
@@ -130,3 +159,18 @@ def event(room=None):
             })
         return {"events": events}
 
+'''
+registration {
+    event: id,
+    person: id
+}
+'''
+@app.route('/register', methods=['POST'])
+def register():
+    registrationData = request.json
+    registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
+    db.session.add(registration)
+    db.session.flush()
+    db.session.refresh(registration)
+    db.session.commit()
+    return {"registration_id": registration.id}
