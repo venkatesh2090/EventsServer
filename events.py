@@ -26,12 +26,12 @@ Person.emails = db.relationship("Email", back_populates="person")
 
 class Organisation(db.Model):
     __tablename__ = 'organisation'
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    organisation_email = Column(String(320), nullable=False, unique=True)
-    friendly_name = Column(String, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = Column(String(320), nullable=False, unique=True)
+    name = Column(String, nullable=True)
 
 class Event(db.Model):
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     organisation = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
     organiser = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
     date = Column(Date, nullable=False)
@@ -70,7 +70,7 @@ event {
 @app.route('/organisation', methods=['POST'])
 def organisation():
     orgData = request.json
-    org = Organisation(friendly_name=orgData["name"], organisation_email=orgData["email"])
+    org = Organisation(name=orgData["name"], email=orgData["email"])
     db.session.add(org)
     db.session.commit()
     return {"msg": "ok"}
