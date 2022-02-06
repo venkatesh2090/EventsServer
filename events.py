@@ -22,7 +22,7 @@ class Email(db.Model):
     person_id = Column(String, ForeignKey('person.id'), unique=False)
     person = db.relationship("User", back_populates="emails")
 
-Person.emails = db.relationship("Email", back_populates="user")
+Person.emails = db.relationship("Email", back_populates="person")
 
 class Organisation(db.Model):
     __tablename__ = 'organisation'
