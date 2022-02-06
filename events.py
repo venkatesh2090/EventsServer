@@ -51,8 +51,8 @@ class Registration(db.Model):
         ForeignKeyConstraint(["event_id"], ["event.id"]),
         ForeignKeyConstraint(["person_id"], ["person.id"])
         )
-    event = db.relationship("Event", back_populates="registration")
-    person = db.relationship("Person", back_populates="registration")
+    event = db.relationship("Event", back_populates="registrations")
+    person = db.relationship("Person", back_populates="registrations")
 
 Organisation.events = db.relationship("Event", back_populates="organisation")
 Person.events = db.relationship("Event", back_populates="organiser")
