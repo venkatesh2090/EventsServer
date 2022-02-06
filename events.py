@@ -1,16 +1,12 @@
-from socket import socket
-from urllib import response
-from flask import Flask, Response, request, json
+from flask import Flask, Response, request
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
-from flask_ngrok import run_with_ngrok
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL_1')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-run_with_ngrok(app)
 socketio = SocketIO(app)
 
 class Person(db.Model):
