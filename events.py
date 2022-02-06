@@ -122,6 +122,7 @@ def event(room=None):
                 "organiser": event.organiser_id,
                 "date": event.date,
                 "room": event.room
+                "id": event.id
             })
         return {"events": events}
 
