@@ -1,7 +1,7 @@
 from ast import For
 import email
 from flask import Flask, Response, request
-from sqlalchemy import String, Column, ForeignKey, Date, UniqueConstraint
+from sqlalchemy import String, Column, ForeignKey, Date, UniqueConstraint, ForeignKeyConstraint
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
@@ -47,7 +47,9 @@ class Registration(db.Model):
     event_id = Column(UUID(as_uuid=True), ForeignKey("event.id"), nullable=False)
     person_id = Column(UUID(as_uuid=True), ForeignKey("person.id"), nullable=False)
     __table_args__ = (
-        UniqueConstraint("event_id", "person_id", name="event_person_unique")
+        UniqueConstraint("event_id", "person_id", name="event_person_unique"),
+        ForeignKeyConstraint(["event_id"], ["event.id"]),
+        ForeignKeyConstraint(["person_id"], ["person.id"])
         )
     event = db.relationship("Event", back_populates="registration")
     person = db.relationship("Person", back_populates="registration")
