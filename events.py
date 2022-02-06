@@ -173,12 +173,9 @@ registration {
 @app.route('/register', methods=['POST'])
 def register():
     registrationData = request.json
-    try:
-        registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
-        db.session.add(registration)
-        db.session.flush()
-        db.session.refresh(registration)
-        db.session.commit()
-        return {"registration_id": registration.id}
-    except IntegrityError:
-        return Response('{"msg": "registration exists"}', status=409)
+    registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
+    db.session.add(registration)
+    db.session.flush()
+    db.session.refresh(registration)
+    db.session.commit()
+    return {"registration_id": registration.id}
