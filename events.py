@@ -1,40 +1,61 @@
+import email
 from flask import Flask, Response, request
+from sqlalchemy import String, Column, ForeignKey, Date
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
-from flask_socketio import SocketIO
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL_1')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-socketio = SocketIO(app)
 
 class Person(db.Model):
-    id = db.Column(db.String, primary_key=True)
-    personal_email = db.Column(db.String(320), nullable=False)
+    __tablename__ = 'person'
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=True)
+
+class Email(db.Model):
+    __tablenmae__ = 'email'
+    email = Column(String(320), primary_key=True)
+    person_id = Column(String, ForeignKey('person.id'), unique=False)
+    person = db.relationship("User", back_populates="emails")
+
+Person.emails = db.relationship("Email", back_populates="user")
+
+class Organisation(db.Model):
+    __tablename__ = 'organisation'
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    organisation_email = Column(String(320), nullable=False, unique=True)
+    friendly_name = Column(String, nullable=True)
+
+class Event(db.Model):
+    organisation = Column(UUID, ForeignKey('organisation.id'), nullable=False, unique=False)
+    organiser = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
+    date = Column(Date, nullable=False)
+
 
 db.create_all()
 
-@app.route('/', methods=['GET','POST'])
+'''
+person {
+    id: "webexid",
+    emails: [
+        "email1",
+        "email2"
+    ],
+    name: "name"
+}
+'''
+@app.route('/person', methods=['POST'])
 def webex_callback():
-    if request.method == 'POST':
-        reqData = request.json
-        id = reqData['data']['id']
-        personal_email = reqData['data']['personEmail']
-        person = Person(id=id, personal_email=personal_email)
-        db.session.add(person)
-        db.session.commit()
-        return Response('OK', 200)
-    else:
-        return Response("I'm alive", 200)
-
-@socketio.on('message')
-def handle_message(data):
-    print('received message' + data)
-
-@socketio.on('json')
-def handle_json(json):
-    print('received json: ' + json)
-
-if __name__ == '__main__':
-    socketio.run()
+    personData = request.json
+    person = Person(id=personData['id'], name=personData.name)
+    person.emails = []
+    for email_address in personData["emails"]:
+        email = Email(email=email_address)
+        person.emails.append(email)
+    db.session.add(person)
+    db.session.commit()
+    return Response('OK', 200)
