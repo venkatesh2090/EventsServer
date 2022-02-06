@@ -20,7 +20,7 @@ class Email(db.Model):
     __tablenmae__ = 'email'
     email = Column(String(320), primary_key=True)
     person_id = Column(String, ForeignKey('person.id'), unique=False)
-    person = db.relationship("User", back_populates="emails")
+    person = db.relationship("Person", back_populates="emails")
 
 Person.emails = db.relationship("Email", back_populates="person")
 
