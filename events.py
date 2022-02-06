@@ -69,7 +69,7 @@ event {
 @app.route('/organisation', methods=['POST'])
 def organisation():
     orgData = request.json
-    org = Organisation(name=orgData["name"])
+    org = Organisation(friendly_name=orgData["name"])
     db.session.add(org)
     db.session.commit()
     return {"msg": "ok"}
