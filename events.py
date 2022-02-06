@@ -37,4 +37,4 @@ def handle_json(json):
     print('received json: ' + json)
 
 if __name__ == '__main__':
-    app.run()
+    socketio.run()
