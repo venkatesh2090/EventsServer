@@ -44,8 +44,8 @@ class Event(db.Model):
 class Registration(db.Model):
     __tablename__ = 'registration'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    event_id = Column(UUID(as_uuid=True), ForeignKey("event.id"), nullable=False)
-    person_id = Column(UUID(as_uuid=True), ForeignKey("person.id"), nullable=False)
+    event_id = Column(UUID(as_uuid=True), nullable=False)
+    person_id = Column(UUID(as_uuid=True), nullable=False)
     __table_args__ = (
         UniqueConstraint("event_id", "person_id", name="event_person_unique"),
         ForeignKeyConstraint(["event_id"], ["event.id"]),
