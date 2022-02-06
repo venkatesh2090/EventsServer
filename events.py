@@ -123,5 +123,5 @@ def event(room=None):
                 "date": event.date,
                 "room": event.room
             })
-        return events
+        return {"events": events}
 
