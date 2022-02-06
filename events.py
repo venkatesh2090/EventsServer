@@ -94,12 +94,12 @@ event {
 def event(room=None):
     eventData = request.json
     if request.method == 'POST':
-        event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"])
+        event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"], room=eventData["room"])
         db.session.add(event)
         db.session.commit()
         return {"msg": "ok"}
     elif request.method == 'PUT':
-        event = Event(organisation_id=eventData["organisation"], date=eventData["date"])
+        event = Event(organisation_id=eventData["organisation"], date=eventData["date"], room=eventData["room"])
         if (type(eventData["organiser"]) == 'str'):
             event.organiser = eventData["organiser"]
         else:
