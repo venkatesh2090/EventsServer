@@ -1,1 +1,1 @@
-web: gunicorn -w 4 events:socketio
+web: gunicorn -w 4 events:app
