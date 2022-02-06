@@ -36,7 +36,9 @@ class Event(db.Model):
     organiser_id = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
     date = Column(Date, nullable=False)
     organiser = db.relationship("Person", back_populates="events")
+    organisation = db.relationship("Organisation", back_populates="events")
 
+Organisation.events = db.relationship("Event", back_populates="organisation")
 Person.events = db.relationship("Event", back_populates="organiser")
 
 db.create_all()
@@ -85,18 +87,17 @@ event {
     date: "yyyy-mm-dd"
 }
 '''
-
 @app.route('/event', methods=['POST', 'PUT'])
 def event():
     if request.method == 'POST':
         eventData = request.json
-        event = Event(organisation=eventData["organisation"], organiser=eventData["organiser"], date=eventData["date"])
+        event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"])
         db.session.add(event)
         db.session.commit()
         return {"msg", "ok"}
     elif request.method == 'PUT':
         eventData = request.json
-        event = Event(organisation=eventData["organisation"], date=eventData["date"])
+        event = Event(organisation_id=eventData["organisation"], date=eventData["date"])
         if (type(eventData["organiser"]) == 'str'):
             event.organiser = eventData["organiser"]
         else:
