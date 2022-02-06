@@ -66,7 +66,7 @@ event {
     name: "Org Name"
 }
 '''
-@app.route('/organisation', method=['POST'])
+@app.route('/organisation', methods=['POST'])
 def organisation():
     orgData = request.json
     org = Organisation(name=orgData["name"])
@@ -74,7 +74,7 @@ def organisation():
     db.session.commit()
     return {"msg": "ok"}
 
-@app.route('/event', method=['POST'])
+@app.route('/event', methods=['POST'])
 def event():
     eventData = request.json
     event = Event(organisation=eventData["organisation"], organiser=eventData["organiser"], date=eventData["date"])
