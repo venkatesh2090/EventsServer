@@ -167,13 +167,24 @@ def event(room=None):
 '''
 registration {
     event: id,
-    person: id
+    person: Person with Email
 }
 '''
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['PUT'])
 def register():
     registrationData = request.json
-    registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
+    personData = registrationData["person"]
+    personFromDb = Person.query.filter_by(id=personData["id"]).all()
+    registration = Registration(event_id=registrationData['event'])
+    if (len(personFromDb) == 0):
+        person = Person(name=personData["name"], id=personData["id"])
+        person.emails = []
+        for email_address in personData["emails"]:
+            email = Email(email=email_address)
+            person.emails.append(email)
+        registration.person = person
+    else:
+        registration.person_id = personData["id"]
     db.session.add(registration)
     db.session.flush()
     db.session.refresh(registration)
