@@ -34,7 +34,8 @@ class Event(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     organisation_id = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
     organiser_id = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
-    date = Column(Date, nullable=False)
+    date = Column(Date, nullable=False, unique=False)
+    room = Column(String, nullable=False, unique=False)
     organiser = db.relationship("Person", back_populates="events")
     organisation = db.relationship("Organisation", back_populates="events")
 
