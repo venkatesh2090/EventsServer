@@ -32,10 +32,12 @@ class Organisation(db.Model):
 
 class Event(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    organisation = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
-    organiser = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
+    organisation_id = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
+    organiser_id = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
     date = Column(Date, nullable=False)
+    organiser = db.relationship("Person", back_populates="events")
 
+Person.events = db.relationship("Event", back_populates="organiser")
 
 db.create_all()
 
@@ -75,10 +77,36 @@ def organisation():
     db.session.commit()
     return {"msg": "ok"}
 
-@app.route('/event', methods=['POST'])
+'''
+PUT
+event {
+    organisation: "orgid",
+    organiser: Person with Email,
+    date: "yyyy-mm-dd"
+}
+'''
+
+@app.route('/event', methods=['POST', 'PUT'])
 def event():
-    eventData = request.json
-    event = Event(organisation=eventData["organisation"], organiser=eventData["organiser"], date=eventData["date"])
-    db.session.add(event)
-    db.session.commit()
-    return {"msg", "ok"}
+    if request.method == 'POST':
+        eventData = request.json
+        event = Event(organisation=eventData["organisation"], organiser=eventData["organiser"], date=eventData["date"])
+        db.session.add(event)
+        db.session.commit()
+        return {"msg", "ok"}
+    elif request.method == 'PUT':
+        eventData = request.json
+        event = Event(organisation=eventData["organisation"], date=eventData["date"])
+        if (type(eventData["organiser"]) == 'str'):
+            event.organiser = eventData["organiser"]
+        else:
+            personData = eventData["organiser"]
+            person = Person(id=personData["id"], name=personData["name"])
+            person.emails = []
+            for email_address in personData["emails"]:
+                email = Email(email=email_address)
+                person.emails.append(email)
+            event.organiser = person
+        db.session.add(event)
+        db.session.commit()
+        return {"msg": "ok"}
