@@ -32,7 +32,7 @@ class Organisation(db.Model):
 
 class Event(db.Model):
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    organisation = Column(UUID, ForeignKey('organisation.id'), nullable=False, unique=False)
+    organisation = Column(UUID(as_uuid=True), ForeignKey('organisation.id'), nullable=False, unique=False)
     organiser = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
     date = Column(Date, nullable=False)
 
