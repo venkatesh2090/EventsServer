@@ -1,9 +1,7 @@
 from urllib import response
 from flask import Flask, Response, request, json
-from sqlalchemy.dialects.postgresql import UUID
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
-import uuid
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
@@ -12,7 +10,7 @@ db = SQLAlchemy(app)
 db.create_all()
 
 class Person(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     personal_email = db.Column(db.String(320), nullable=False)
 
 
