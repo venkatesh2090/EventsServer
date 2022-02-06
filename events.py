@@ -61,8 +61,23 @@ def person():
     db.session.commit()
     return {"msg": "ok"}
 
+'''
+event {
+    name: "Org Name"
+}
+'''
 @app.route('/organisation', method=['POST'])
 def organisation():
     orgData = request.json
     org = Organisation(name=orgData["name"])
+    db.session.add(org)
+    db.session.commit()
     return {"msg": "ok"}
+
+@app.route('/event', method=['POST'])
+def event():
+    eventData = request.json
+    event = Event(organisation=eventData["organisation"], organiser=eventData["organiser"], date=eventData["date"])
+    db.session.add(event)
+    db.session.commit()
+    return {"msg", "ok"}
