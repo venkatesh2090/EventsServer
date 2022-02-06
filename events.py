@@ -7,6 +7,7 @@ import uuid
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 class Person(db.Model):
@@ -17,7 +18,7 @@ class Person(db.Model):
 @app.route('/webex/callback', methods=['GET','POST'])
 def webex_callback():
     if request.method == 'POST':
-        reqData = json.loads(request.json)
+        reqData = request.json
         print(reqData.data.id)
         print(reqData.data.personEmail)
         return Response('OK', 200)
