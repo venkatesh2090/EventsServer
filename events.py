@@ -64,12 +64,13 @@ def person():
 '''
 event {
     name: "Org Name"
+    email: "email"
 }
 '''
 @app.route('/organisation', methods=['POST'])
 def organisation():
     orgData = request.json
-    org = Organisation(friendly_name=orgData["name"])
+    org = Organisation(friendly_name=orgData["name"], organisation_email=orgData["email"])
     db.session.add(org)
     db.session.commit()
     return {"msg": "ok"}
