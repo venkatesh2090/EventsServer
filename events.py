@@ -52,7 +52,7 @@ person {
 @app.route('/person', methods=['POST'])
 def webex_callback():
     personData = request.json
-    person = Person(id=personData['id'], name=personData.name)
+    person = Person(id=personData["id"], name=personData["name"])
     person.emails = []
     for email_address in personData["emails"]:
         email = Email(email=email_address)
