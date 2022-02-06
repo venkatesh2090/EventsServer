@@ -46,7 +46,9 @@ class Registration(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     event_id = Column(UUID(as_uuid=True), ForeignKey("event.id"), nullable=False)
     person_id = Column(UUID(as_uuid=True), ForeignKey("person.id"), nullable=False)
-    __table_args__ = (UniqueConstraint("event_id", "person_id", name="event_person_unique"))
+    __table_args__ = (
+        UniqueConstraint("event_id", "person_id", name="event_person_unique")
+        )
     event = db.relationship("Event", back_populates="registration")
     person = db.relationship("Person", back_populates="registration")
 
