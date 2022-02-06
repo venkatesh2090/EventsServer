@@ -97,7 +97,7 @@ def event(room=None):
         event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"])
         db.session.add(event)
         db.session.commit()
-        return {"event_id": event.id}
+        return {"msg": "ok"}
     elif request.method == 'PUT':
         event = Event(organisation_id=eventData["organisation"], date=eventData["date"])
         if (type(eventData["organiser"]) == 'str'):
@@ -112,7 +112,7 @@ def event(room=None):
             event.organiser = person
         db.session.add(event)
         db.session.commit()
-        return {"event_id": event.id}
+        return {"msg": "ok"}
     elif request.method == 'GET':
         eventsQueryData = Event.query.filter_by(room=room).all()
         events = []
