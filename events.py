@@ -112,6 +112,8 @@ def event(room=None):
                     email = Email(email=email_address)
                     person.emails.append(email)
                 event.organiser = person
+            else:
+                event.organiser_id = personFromDb[0].id
         db.session.add(event)
         db.session.commit()
         return {"msg": "ok"}
