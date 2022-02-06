@@ -104,7 +104,7 @@ def event(room=None):
             event.organiser = eventData["organiser"]
         else:
             personData = eventData["organiser"]
-            personFromDb = Person.query.filter(id=personData["id"]).all()
+            personFromDb = Person.query.filter_by(id=personData["id"]).all()
             if (len(personFromDb) == 0):
                 person = Person(id=personData["id"], name=personData["name"])
                 person.emails = []
