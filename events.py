@@ -121,7 +121,7 @@ def event(room=None):
                 "organisation": event.organisation_id,
                 "organiser": event.organiser_id,
                 "date": event.date,
-                "room": event.room
+                "room": event.room,
                 "id": event.id
             })
         return {"events": events}
