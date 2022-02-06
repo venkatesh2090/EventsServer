@@ -50,7 +50,7 @@ person {
 }
 '''
 @app.route('/person', methods=['POST'])
-def webex_callback():
+def person():
     personData = request.json
     person = Person(id=personData["id"], name=personData["name"])
     person.emails = []
@@ -59,4 +59,10 @@ def webex_callback():
         person.emails.append(email)
     db.session.add(person)
     db.session.commit()
-    return Response('OK', 200)
+    return {"msg": "ok"}
+
+@app.route('/organisation', method=['POST'])
+def organisation():
+    orgData = request.json
+    org = Organisation(name=orgData["name"])
+    return {"msg": "ok"}
