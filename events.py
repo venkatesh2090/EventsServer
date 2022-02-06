@@ -9,6 +9,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+db.create_all()
 
 class Person(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True)
@@ -19,8 +20,11 @@ class Person(db.Model):
 def webex_callback():
     if request.method == 'POST':
         reqData = request.json
-        print(reqData['data']['id'])
-        print(reqData['data']['personEmail'])
+        id = reqData['data']['id']
+        personal_email = reqData['data']['personEmail']
+        person = Person(id=id, personal_email=personal_email)
+        db.session.add(person)
+        db.session.commit()
         return Response('OK', 200)
     else:
         return Response("I'm alive", 200)
