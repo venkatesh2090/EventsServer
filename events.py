@@ -78,7 +78,7 @@ def organisation():
     org = Organisation(name=orgData["name"], email=orgData["email"])
     db.session.add(org)
     db.session.commit()
-    return {"organisation_id": organisation.id}
+    return {"msg": "ok"}
 
 '''
 PUT
