@@ -67,7 +67,7 @@ def person():
     return {"msg": "ok"}
 
 '''
-event {
+organisation {
     name: "Org Name"
     email: "email"
 }
@@ -78,26 +78,27 @@ def organisation():
     org = Organisation(name=orgData["name"], email=orgData["email"])
     db.session.add(org)
     db.session.commit()
-    return {"msg": "ok"}
+    return {"organisation_id": organisation.id}
 
 '''
 PUT
 event {
     organisation: "orgid",
     organiser: Person with Email,
-    date: "yyyy-mm-dd"
+    date: "yyyy-mm-dd",
+    room: "roomid"
 }
 '''
+@app.route('/event/<room>', methods=['GET'])
 @app.route('/event', methods=['POST', 'PUT'])
-def event():
+def event(room=None):
+    eventData = request.json
     if request.method == 'POST':
-        eventData = request.json
         event = Event(organisation_id=eventData["organisation"], organiser_id=eventData["organiser"], date=eventData["date"])
         db.session.add(event)
         db.session.commit()
-        return {"msg", "ok"}
+        return {"event_id": event.id}
     elif request.method == 'PUT':
-        eventData = request.json
         event = Event(organisation_id=eventData["organisation"], date=eventData["date"])
         if (type(eventData["organiser"]) == 'str'):
             event.organiser = eventData["organiser"]
@@ -111,4 +112,16 @@ def event():
             event.organiser = person
         db.session.add(event)
         db.session.commit()
-        return {"msg": "ok"}
+        return {"event_id": event.id}
+    elif request.method == 'GET':
+        eventsQueryData = Event.query.filter_by(room=room).all()
+        events = []
+        for event in eventsQueryData:
+            events.append({
+                "organisation": event.organisation_id,
+                "organiser": event.organiser_id,
+                "date": event.date,
+                "room": event.room
+            })
+        return events
+
