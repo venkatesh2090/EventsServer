@@ -31,6 +31,7 @@ class Organisation(db.Model):
     friendly_name = Column(String, nullable=True)
 
 class Event(db.Model):
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
     organisation = Column(UUID, ForeignKey('organisation.id'), nullable=False, unique=False)
     organiser = Column(String, ForeignKey('person.id'), nullable=False, unique=False)
     date = Column(Date, nullable=False)
