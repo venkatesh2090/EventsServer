@@ -1,10 +1,11 @@
-from ast import For
+from ast import For, In
 import email
 from flask import Flask, Response, request
 from sqlalchemy import String, Column, ForeignKey, Date, UniqueConstraint, ForeignKeyConstraint
 from os import environ
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.exc import IntegrityError
 import uuid
 
 app = Flask(__name__)
@@ -172,9 +173,12 @@ registration {
 @app.route('/register', methods=['POST'])
 def register():
     registrationData = request.json
-    registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
-    db.session.add(registration)
-    db.session.flush()
-    db.session.refresh(registration)
-    db.session.commit()
-    return {"registration_id": registration.id}
+    try:
+        registration = Registration(event_id=registrationData['event'], person_id=registrationData['person'])
+        db.session.add(registration)
+        db.session.flush()
+        db.session.refresh(registration)
+        db.session.commit()
+        return {"registration_id": registration.id}
+    except IntegrityError:
+        return Response('{"msg": "registration exists"}', status=409)
