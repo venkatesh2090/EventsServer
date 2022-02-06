@@ -104,12 +104,14 @@ def event(room=None):
             event.organiser = eventData["organiser"]
         else:
             personData = eventData["organiser"]
-            person = Person(id=personData["id"], name=personData["name"])
-            person.emails = []
-            for email_address in personData["emails"]:
-                email = Email(email=email_address)
-                person.emails.append(email)
-            event.organiser = person
+            personFromDb = Person.query.filter(id=personData["id"]).all()
+            if (len(personFromDb) == 0):
+                person = Person(id=personData["id"], name=personData["name"])
+                person.emails = []
+                for email_address in personData["emails"]:
+                    email = Email(email=email_address)
+                    person.emails.append(email)
+                event.organiser = person
         db.session.add(event)
         db.session.commit()
         return {"msg": "ok"}
